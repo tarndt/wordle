@@ -10,6 +10,12 @@ import (
 	"strings"
 )
 
+const (
+	defDictPath    = "/usr/share/dict/words"
+	defLetterCount = 5
+	defExludePunc  = true
+)
+
 func main() {
 	dict, letterc, err := loadDictionary(mustGetArgs())
 	if err != nil {
@@ -59,16 +65,18 @@ func main() {
 			}
 		}
 
-		guesser.Narrow(guess, result)
+		if err := guesser.Narrow(guess, result); err != nil {
+			fmt.Printf("Invalid guess or result: %s. Try again!\n", err)
+		}
 	}
 
 }
 
 func mustGetArgs() (dictPath string, letterc uint, excludePunc bool) {
 	var help bool
-	flag.UintVar(&letterc, "letters", 5, "Number of letters in word")
-	flag.StringVar(&dictPath, "dict-file", "/usr/share/dict/words", "Path of dictionary file")
-	flag.BoolVar(&excludePunc, "no-punc", true, "Should words with puncuation be excluded")
+	flag.UintVar(&letterc, "letters", defLetterCount, "Number of letters in word")
+	flag.StringVar(&dictPath, "dict-file", defDictPath, "Path of dictionary file")
+	flag.BoolVar(&excludePunc, "no-punc", defExludePunc, "Should words with puncuation be excluded")
 	flag.BoolVar(&help, "help", false, "Show usage and exit")
 	flag.Parse()
 
@@ -108,7 +116,8 @@ func loadDictionary(dictPath string, letterc uint, excludePunc bool) (Dictionary
 			continue
 		}
 
-		if word = bytes.ToLower(word); keep(word, excludePunc) {
+		word = bytes.ToLower(word)
+		if keep(word, excludePunc) {
 			dict[string(word)] = struct{}{}
 		}
 	}
@@ -171,12 +180,13 @@ func (g *Guesser) Narrow(guess string, result string) error {
 	}
 
 	result = strings.ToLower(result)
-	partials := make(map[byte]uint)
-	extras := make(map[byte]uint)
+	seen := make(map[byte]uint)
+	nos := make(map[byte]uint)
 	for i, letter := range guess {
 		char := byte(letter)
 		switch result[i] {
 		case 'y':
+			seen[char]++
 			for word, _ := range g.dict {
 				if word[i] != char {
 					delete(g.dict, word)
@@ -184,16 +194,15 @@ func (g *Guesser) Narrow(guess string, result string) error {
 			}
 
 		case 'n':
+			nos[char]++
 			for word, _ := range g.dict {
-				if partials[char] == 0 && strings.ContainsRune(word, letter) {
+				if word[i] == char {
 					delete(g.dict, word)
-				} else if partials[char] > 0 {
-					extras[char]++
 				}
 			}
 
 		case 'p':
-			partials[char]++
+			seen[char]++
 			for word, _ := range g.dict {
 				if !strings.ContainsRune(word, letter) || word[i] == char {
 					delete(g.dict, word)
@@ -202,13 +211,18 @@ func (g *Guesser) Narrow(guess string, result string) error {
 
 		default:
 			return fmt.Errorf("Result should be a series of y (yes match), "+
-				" n (no match), p (partial mach, wrong position, but %q was found", result[i])
+				" n (no match), p (partial mach, wrong position), but %q was found", result[i])
 		}
 	}
 
-	for extra, _ := range extras {
+	for char, _ := range nos {
 		for word, _ := range g.dict {
-			if strings.Count(word, string(extra)) > int(partials[extra]) {
+			count := uint(strings.Count(word, string(char)))
+			if count < 1 {
+				continue
+			}
+
+			if seen[char] < 1 || count > seen[char] {
 				delete(g.dict, word)
 			}
 		}
