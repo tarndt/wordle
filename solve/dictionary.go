@@ -1,4 +1,4 @@
-package main
+package solve
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 
 type Dictionary map[string]struct{}
 
-func loadDictionary(dictPath string, letterc uint) (Dictionary, uint, error) {
+func LoadDictionary(dictPath string, letterc uint) (Dictionary, uint, error) {
 	fin, err := os.Open(dictPath)
 	if err != nil {
 		return nil, 0, fmt.Errorf("Could not open dictionary file %q: %w", dictPath, err)

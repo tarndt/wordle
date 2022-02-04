@@ -2,24 +2,21 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"log"
 	"os"
-)
 
-const (
-	defDictPath    = "/usr/share/dict/words"
-	defLetterCount = 5
+	"github.com/tarndt/wordle/conf"
+	"github.com/tarndt/wordle/solve"
 )
 
 func main() {
-	dict, letterc, err := loadDictionary(mustGetArgs())
+	dict, letterc, err := solve.LoadDictionary(conf.MustGetArgs())
 	if err != nil {
 		log.Fatalf("Could not load dictionary: %s", err)
 	}
 
-	guesser := newGuesser(dict, letterc)
+	guesser := solve.NewGuesser(dict, letterc)
 	usr := bufio.NewScanner(os.Stdin)
 	for {
 		possibleMatches := guesser.PossibleMatches()
@@ -46,7 +43,7 @@ func main() {
 			if err := usr.Err(); err != nil {
 				log.Fatalf("Coult not read user input: %s", err)
 			}
-			if validResult(guess) {
+			if solve.ValidResult(guess) {
 				fmt.Println("You entered a result, not word. Try again.")
 				guess = ""
 				continue
@@ -72,19 +69,4 @@ func main() {
 		}
 	}
 
-}
-
-func mustGetArgs() (dictPath string, letterc uint) {
-	var help bool
-	flag.UintVar(&letterc, "letters", defLetterCount, "Number of letters in word")
-	flag.StringVar(&dictPath, "dict-file", defDictPath, "Path of dictionary file")
-	flag.BoolVar(&help, "help", false, "Show usage and exit")
-	flag.Parse()
-
-	if help {
-		flag.PrintDefaults()
-		os.Exit(0)
-	}
-
-	return
 }

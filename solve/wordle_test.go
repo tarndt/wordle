@@ -1,9 +1,11 @@
-package main
+package solve
 
 import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/tarndt/wordle/conf"
 )
 
 func TestGames(t *testing.T) {
@@ -11,13 +13,13 @@ func TestGames(t *testing.T) {
 
 	for i, tcase := range games {
 		letterc := uint(len(tcase[0][0]))
-		dict, dicLetterc, err := loadDictionary(defDictPath, letterc)
+		dict, dicLetterc, err := LoadDictionary(conf.DefDictPath, letterc)
 		if err != nil {
-			t.Fatalf("Could not load dictionary from %q (default config): %s", defDictPath, err)
+			t.Fatalf("Could not load dictionary from %q (default config): %s", conf.DefDictPath, err)
 		} else if letterc != dicLetterc {
 			t.Fatalf("Dictionary returned letter count of %d rather than %d as expected", dicLetterc, letterc)
 		}
-		guesser := newGuesser(dict, letterc)
+		guesser := NewGuesser(dict, letterc)
 
 		t.Run(fmt.Sprintf("game-%d", i), func(t *testing.T) {
 			for _, pair := range tcase {
@@ -128,9 +130,9 @@ func TestPlayEntireDictionary(t *testing.T) {
 		t.Skip("Skipping in short mode")
 	}
 
-	dict, letterc, err := loadDictionary(defDictPath, defLetterCount)
+	dict, letterc, err := LoadDictionary(conf.DefDictPath, conf.DefLetterCount)
 	if err != nil {
-		t.Fatalf("Could not load dictionary from %q (default config): %s", defDictPath, err)
+		t.Fatalf("Could not load dictionary from %q (default config): %s", conf.DefDictPath, err)
 	}
 
 	//[]scorefunc{scoreBasic, scoreWFreq, scoreBasicSquared, scoreWeightOptLeft, scoreWeightOptElim}
@@ -139,7 +141,7 @@ func TestPlayEntireDictionary(t *testing.T) {
 			totalGuesses := 0
 			for word := range dict {
 				gameDict := dict.Clone()
-				guesser, guessCount, guess := newGuesser(gameDict, letterc), 0, ""
+				guesser, guessCount, guess := NewGuesser(gameDict, letterc), 0, ""
 				guesser.score = scorer
 
 				for {

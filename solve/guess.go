@@ -1,4 +1,4 @@
-package main
+package solve
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ type Guesser struct {
 	score   scorefunc
 }
 
-func newGuesser(dict Dictionary, letterc uint) *Guesser {
+func NewGuesser(dict Dictionary, letterc uint) *Guesser {
 	g := &Guesser{
 		letterc: letterc,
 		opts:    make([]map[byte]uint, letterc),
@@ -36,7 +36,7 @@ func (g *Guesser) Narrow(guess string, result string) error {
 		return fmt.Errorf("guess: %q, was not %d letters long", guess, g.letterc)
 	case len(guess) != len(result):
 		return fmt.Errorf("guess: %q, and result %q are not the same length", guess, result)
-	case !validResult(result):
+	case !ValidResult(result):
 		return errNotResult
 	}
 
@@ -148,7 +148,7 @@ func (g *Guesser) analyze() {
 	}
 }
 
-func validResult(result string) bool {
+func ValidResult(result string) bool {
 	if result == "" {
 		return false
 	}

@@ -1,4 +1,4 @@
-package main
+package solve
 
 type optmap []map[byte]uint
 type freqmap map[byte]uint
