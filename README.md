@@ -1,7 +1,8 @@
 # wordle
-Simple wordle solver
+Command-line wordle solver!
 
-Lets see it in action:
+## Example
+Lets see it in action, first:
 ```
 $ ./wordle 
 5914 possible remaining matches of 5 letters.
@@ -24,7 +25,15 @@ Recomended guess is: "those"
 
 Our work here is done!
 ```
+## Building
+Lets download and build this wordle solver. To build the [Go toolchain](https://pkg.go.dev/cmd/go) must be [installed](https://go.dev/doc/install) after that building is a simple matter of running `go build`.
+```
+$ git clone https://github.com/tarndt/wordle.git
+$ cd wordle
+$ go build
+```
 
+## Usage
 Usage:
 ```
 $ ./wordle -help
@@ -34,6 +43,4 @@ $ ./wordle -help
     	Show usage and exit
   -letters uint
     	Number of letters in word (default 5)
-  -no-punc
-    	Should words with puncuation be excluded (default true)
 ```
