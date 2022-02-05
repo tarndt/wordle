@@ -22,7 +22,7 @@ func main() {
 		possibleMatches := guesser.PossibleMatches()
 		fmt.Printf("%d possible remaining matches of %d letters.\n", possibleMatches, letterc)
 		recomendation := guesser.Guess()
-		fmt.Printf("Recomended guess is: %q\n\n", recomendation)
+		fmt.Printf("Recommended guess is: %q\n\n", recomendation)
 
 		switch possibleMatches {
 		case 1:

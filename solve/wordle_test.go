@@ -28,7 +28,7 @@ func TestGames(t *testing.T) {
 
 				if result == "" {
 					if remaining := guesser.PossibleMatches(); remaining > 1 {
-						t.Fatalf("%d remaining possible matches (%q recomended) rather than just %q", remaining, rec, guess)
+						t.Fatalf("%d remaining possible matches (%q recommended) rather than just %q", remaining, rec, guess)
 					}
 					if rec != guess {
 						t.Fatalf("Computed guess was %q, but %q was expected", rec, guess)
@@ -122,6 +122,18 @@ var games = [][][2]string{
 		[2]string{"shark", "yyyyn"},
 		[2]string{"sharp", "yyyyn"},
 		[2]string{"shard", ""},
+	},
+	[][2]string{ //230
+		[2]string{"raise", "npnnp"},
+		[2]string{"begat", "npnyy"},
+		[2]string{"cheat", "nnyyy"},
+		[2]string{"pleat", ""},
+	},
+	[][2]string{ //231
+		[2]string{"raise", "npnnn"},
+		[2]string{"clank", "nypnn"},
+		[2]string{"allot", "yynpy"},
+		[2]string{"aloft", ""},
 	},
 }
 

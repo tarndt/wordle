@@ -103,8 +103,23 @@ func (g *Guesser) Narrow(guess string, result string) error {
 }
 
 func (g *Guesser) Guess() string {
-	g.analyze()
+	//Manual optimization for turn 1 now... generalization in progress
+	if len(g.dict) > 500 {
+		if _, contains := g.dict["roate"]; contains {
+			return "roate"
+		}
+		if _, contains := g.dict["raise"]; contains {
+			return "raise"
+		}
+		if _, contains := g.dict["raile"]; contains {
+			return "raile"
+		}
+		if _, contains := g.dict["sales"]; contains {
+			return "sales"
+		}
+	}
 
+	g.analyze()
 	var cannidate string
 	var highscore, freqscore uint
 
@@ -120,13 +135,6 @@ func (g *Guesser) Guess() string {
 			cannidate, highscore, freqscore = word, score, freq
 		} else if score == highscore && freq > freqscore {
 			cannidate, highscore, freqscore = word, score, freq
-		}
-	}
-
-	//Manual optimization for turn 1 now... generalization in progress
-	if len(g.dict) > 500 && cannidate == "sores" {
-		if _, contains := g.dict["sales"]; contains {
-			return "sales"
 		}
 	}
 
